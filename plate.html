@@ -32,17 +32,19 @@
 </style>
 <style type="text/css" media="print">
     table {
-        font-size: 8px;
+        font-size: 7px;
         width: 100%;
         table-layout: auto;
     }
     table th, table td {
         padding: 5px 8px;
     }
+    table { page-break-inside:auto }
+    tr    { page-break-inside:avoid; page-break-after:auto }
+    thead { display:table-header-group }
+    tfoot { display:table-footer-group }
 </style>
 
-<!-- <code><kbd>Asym</kbd> = Asymmetrical, <kbd>Sym</kbd> = Symmetrical, <kbd>Unidir</kbd> = Unidirectional</code>
-<hr> -->
 <div class="header">
     <h3>Consumer Count Survey</h3>
 </div>
@@ -87,29 +89,40 @@ var rand = function(array) {
     return i;
 }
 
-var cars = [
-    { make: 'Toyota', variant: ['Vios', 'Avanza', 'Camry', 'Wish', 'Corolla'] },
-    { make: 'Proton', variant: ['Saga', 'Gen2', 'Exora', 'Satria', 'Pesona'] },
-    { make: 'Honda', variant: ['City', 'Civic', 'Accord', 'Odyssey', 'CR-V', 'Jazz'] },
-    { make: 'Perodua', variant: ['Myvi', 'Axia', 'Kancil', 'Alza', ] },
-    { make: 'Nissan', variant: ['Teana', 'Sylphy', 'Almera', 'Grand Livina', 'Murano', 'Cefiro'] },
-    { make: 'BMW', variant: ['3 Series', '5 Series'] },
+var major_cars = {
+    proton: { make: 'Proton', variant: [{ n:'Saga', t:0, min:13, max:18}, { n:'Gen2', t:0, min:15, max:18}, { n:'Exora', t:2, min:15, max:18}, { n:'Satria', t:0, min:15, max:18}, { n:'Pesona', t:0, min:15, max:18} ] },
+    perodua: { make: 'Perodua', variant: [{ n:'Myvi', t:0, min:15, max:18}, { n:'Axia', t:0, min:15, max:18}, { n:'Kancil', t:0, min:13, max:15}, { n:'Alza', t:2, min:15, max:18} ] }
+}
 
-    { make: 'Ford', variant: ['Focus', 'Fiesta', 'Mondeo'] },
-    { make: 'Volkswagen', variant: ['Beetle', 'Polo', 'Jetta', 'Scirocco', 'Passat'] },
-    { make: 'Hyundai', variant: ['Ascend', 'Elantra', 'Tucson'] }
+var car_types = ['PSR', 'SUV', 'MPV']
+
+var cars = [
+    { make: 'Toyota', variant: [ { n:'Vios', t:0, min:15, max:20}, { n:'Avanza', t:2, min:15, max:20}, { n:'Camry', t:0, min:15, max:20}, { n:'Wish', t:2, min:15, max:20}, {n:'Corolla', t:0, min:15, max:20}] },
+    major_cars.proton,
+    { make: 'Honda', variant: [{ n:'City', t:0, min:15, max:18}, { n:'Civic', t:0, min:15, max:20}, { n:'Accord', t:0, min:15, max:20}, { n:'Odyssey', t:2, min:15, max:20}, {n:'CR-V', t:1, min:15, max:22}, { n:'Jazz', t:0, min:15, max:20}] },
+    { make: 'Nissan', variant: [{n:'Teana', t:0, min:15, max:20 }, {n:'Sylphy', t:0, min:15, max:18 }, {n:'Almera', t:0, min:15, max:18 }, {n:'Grand Livina', t:2, min:15, max:20 }, {n:'Murano', t:1, min:15, max:22 }, {n:'Cefiro', t:0, min:15, max:22}] },
+    major_cars.perodua,
+    { make: 'BMW', variant: [{n:'3 Series', t:0, min:16, max:20}, {n:'5 Series', t:0, min:16, max:20}] },
+    major_cars.proton,
+    { make: 'Ford', variant: [{n:'Focus', t:0, min:15, max:18}, {n:'Fiesta', t:0, min:15, max:18}, {n:'Mondeo', t:0, min:15, max:18}] },
+    major_cars.perodua,
+    { make: 'Volkswagen', variant: [{n:'Beetle', t:0, min:15, max:18}, {n:'Polo', t:0, min:15, max:18}, {n:'Jetta', t:0, min:15, max:20}, {n:'Scirocco', t:0, min:15, max:20}, {n:'Passat', t:0, min:15, max:20}] },
+    major_cars.proton,
+    { make: 'Hyundai', variant: [{n:'Ascend', t:0, min:15, max:18}, {n:'Elantra', t:0, min:15, max:18}, {n:'Tucson', t:1, min:15, max:22}] },
+    major_cars.proton,
+    major_cars.perodua,
 ];
 
 var tyre = {
     brands: [
         { name: 'GoodYear', patterns: ['FuelMax', 'ComforTred', 'TripleTred'] },
         { name: 'Michelin', patterns: ['XLINE', 'XMULTI', 'XINCITY'] },
-        { name: 'Dunlop', patterns: ['StreetResponse2', 'Sport Maxx RT', 'Sport Maxx TT'] },
+        { name: 'Dunlop', patterns: ['SR2', 'SM RT', 'SM TT'] },
         { name: 'Hankook', patterns: ['K120', 'H452', 'H457', 'K107', 'K110', 'K115', 'K117', 'Z222', 'H433', 'H308'] },
         { name: 'Kumho', patterns: ['ECSTA XS', 'ECSTA V720', 'ECSTA LE SPORT', 'ECSTA SPT', 'ECSTA ASX'] },
         { name: 'Maxxis', patterns: ['M36', 'VICTRA MA510', 'VICTRA PRO R1', 'MA-1', 'MA-P1'] },
         { name: 'Silverstone', patterns: ['NS-500', 'PowerBlitz 1800', 'PowerBlitz 200', 'NS-223', 'NS-700', 'Atlantis V7', 'Synergy M5', 'Synergy M3'] },
-        { name: 'GT Radial', patterns: ['CHAMPIRO ECO', 'CHAMPIRO WT PLUS'] },
+        { name: 'GT Radial', patterns: ['CHAMPIRO ECO', 'CHAMPIRO WT+'] },
         { name: 'Continental', patterns: ['ComfortContact', 'EcoContact', 'PremiumContact', 'SportContact'] },
         { name: 'Falken', patterns: ['SN211', 'PT722', 'PROG4', 'ZE612', 'ZE329', 'SN828'] },
         { name: 'Toyo', patterns: ['T1', 'R1R', 'C1S', 'T1R'] },
@@ -120,7 +133,7 @@ var tyre = {
     // pattern: ['Asym', 'Sym', 'Unidir', 'Asym & Unidir'],
     sw: [145,155,165,175,185,195,205,215,225,235,245,255,265,275,285,295,305,315,325,335],
     ar: [25,30,35,40,45,50,55,60,65,70,75],
-    rd: [12,13,14,15,16,17,18,19,20,21,22],
+    rd: [13,14,15,16,17,18,19,20,21,22],
     rw: [5.0, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5]
 }
 
@@ -138,7 +151,7 @@ var maketyre = function() {
 }
 
 var makeplate = function() {
-    var alphabets = 'ABCDEFGHJKLMNPQRSTUVWXY';
+    var alphabets = 'ABCDEFGHJKLMNPQ';
     var number = '1234567890';
     var state = ['J', 'J', 'J', 'B', 'W']
     var plate = state[rand(state)];
@@ -151,15 +164,26 @@ var makeplate = function() {
     return plate + plateno;
 }
 
-var makecar = function() {
-    var a = rand(cars)
-    var car = cars[a].make + ' ' + cars[a].variant[rand(cars[a].variant)];
+var makecar = function(diam) {
+    var a = '';
+    var b = {};
+    var i = 0;
+
+    while(cars[i]) {
+        a = rand(cars);
+        b = cars[a].variant[rand(cars[a].variant)];
+        if (diam <= b.max && diam >= b.min) { break; }
+        else { continue; }
+        i++;
+    };
+
+    var car = cars[a].make + ' ' + b.n + '<kbd>(' + car_types[b.t] + ')</kbd>';
     return car;
 }
 
 var textgen = function(ix, res) {
     var text = '';
-    text += '<tr><td><code>' + ix + '</code></td><td><code>' + makeplate() + '</code></td><td>' + makecar() + '</td>';
+    text += '<tr><td><code>' + ix + '</code></td><td><code>' + makeplate() + '</code></td><td>' + makecar(res.diam) + '</td>';
     // Section Width
     text += '<td><code>' + res.width + '</code></td>';
     text += '<td><code>' + res.width + '</code></td>';
